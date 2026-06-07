@@ -1,1 +1,1 @@
-IS test Created by claude ai 60 questions 40 mcqs, 20 true or false.
+IS test Created by claude ai 150 questions 120 mcqs, 30 true or false.
