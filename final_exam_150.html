@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Exam — 150 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1e3c;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --cream: #fdf8f0;
+    --white: #ffffff;
+    --gray: #6b7280;
+    --light-gray: #f3f4f6;
+    --border: #e5e0d5;
+    --correct: #16a34a;
+    --wrong: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+  header {
+    background: var(--navy); color: var(--white);
+    padding: 40px 24px 32px; text-align: center; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(201,168,76,0.05) 30px, rgba(201,168,76,0.05) 31px);
+  }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,3rem); font-weight: 900; position: relative; }
+  header .subtitle { margin-top: 8px; color: var(--gold-light); font-size: 0.95rem; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; position: relative; }
+  .gold-bar { width: 60px; height: 3px; background: var(--gold); margin: 16px auto 0; position: relative; }
+
+  .exam-meta { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; padding: 16px 24px; background: var(--navy); border-top: 1px solid rgba(201,168,76,0.3); }
+  .meta-item { color: rgba(255,255,255,0.7); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+  .meta-item span { color: var(--gold-light); font-weight: 600; }
+
+  .progress-bar-wrap { background: var(--white); border-bottom: 1px solid var(--border); padding: 12px 24px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 16px; }
+  .progress-bar-bg { flex: 1; height: 8px; background: var(--light-gray); border-radius: 999px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 999px; width: 0%; transition: width 0.4s ease; }
+  .progress-label { font-size: 0.8rem; color: var(--gray); white-space: nowrap; font-weight: 600; }
+
+  .container { max-width: 820px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  .section-header { display: flex; align-items: center; gap: 12px; margin: 40px 0 20px; }
+  .section-badge { background: var(--navy); color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 4px; white-space: nowrap; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  .chapter-header { background: linear-gradient(135deg, var(--navy) 0%, #1a3060 100%); color: var(--white); border-radius: 10px; padding: 16px 20px; margin: 28px 0 16px; display: flex; align-items: center; gap: 12px; }
+  .chapter-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+  .chapter-info { }
+  .chapter-info h3 { font-size: 1rem; font-weight: 700; }
+  .chapter-info p { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+  .question-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 22px; margin-bottom: 14px; transition: box-shadow 0.2s; }
+  .question-card:hover { box-shadow: 0 4px 16px rgba(15,30,60,0.08); }
+  .question-card.answered-correct { border-left: 4px solid var(--correct); }
+  .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+
+  .q-number { font-size: 0.7rem; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .q-text { font-size: 0.98rem; font-weight: 600; line-height: 1.55; color: var(--navy); margin-bottom: 14px; }
+
+  .options { display: flex; flex-direction: column; gap: 7px; }
+  .option-btn { display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); cursor: pointer; text-align: left; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; color: var(--navy); transition: all 0.15s; }
+  .option-btn:hover:not(:disabled) { border-color: var(--gold); background: #fdf3d9; }
+  .option-btn .opt-label { font-weight: 700; color: var(--gold); min-width: 20px; font-size: 0.82rem; flex-shrink: 0; }
+  .option-btn.correct { border-color: var(--correct); background: #f0fdf4; color: var(--correct); }
+  .option-btn.correct .opt-label { color: var(--correct); }
+  .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+  .option-btn.wrong .opt-label { color: var(--wrong); }
+  .option-btn.reveal-correct { border-color: var(--correct); background: #f0fdf4; color: var(--correct); opacity: 0.75; }
+  .option-btn:disabled { cursor: default; }
+
+  .tf-buttons { display: flex; gap: 10px; }
+  .tf-btn { flex: 1; padding: 11px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); cursor: pointer; font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--navy); letter-spacing: 1px; transition: all 0.15s; }
+  .tf-btn:hover:not(:disabled) { border-color: var(--gold); background: #fdf3d9; }
+  .tf-btn.correct { border-color: var(--correct); background: #f0fdf4; color: var(--correct); }
+  .tf-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+  .tf-btn:disabled { cursor: default; }
+
+  .feedback { margin-top: 10px; padding: 9px 13px; border-radius: 7px; font-size: 0.86rem; font-weight: 600; display: none; }
+  .feedback.correct { background: #f0fdf4; color: var(--correct); display: block; }
+  .feedback.wrong { background: #fff5f5; color: var(--wrong); display: block; }
+
+  .score-panel { background: var(--navy); color: var(--white); border-radius: 12px; padding: 32px; text-align: center; margin-top: 48px; display: none; }
+  .score-panel h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 8px; }
+  .score-big { font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 900; color: var(--gold-light); line-height: 1; }
+  .score-sub { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 8px; }
+  .score-breakdown { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 20px; }
+  .score-item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 20px; }
+  .score-item .val { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--gold-light); }
+  .score-item .lbl { font-size: 0.75rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+  .grade-badge { display: inline-block; padding: 6px 20px; border-radius: 999px; font-size: 1.1rem; font-weight: 700; margin-top: 16px; letter-spacing: 1px; }
+
+  .submit-btn { display: block; margin: 40px auto 0; padding: 14px 48px; background: var(--navy); color: var(--gold-light); border: none; border-radius: 8px; font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
+  .submit-btn:hover { background: #1a3060; }
+
+  @media(max-width:600px) { .chapter-num { font-size: 1.4rem; } .score-big { font-size: 3rem; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Final Examination</h1>
+  <p class="subtitle">Information Systems &amp; Professional Skills</p>
+  <div class="gold-bar"></div>
+</header>
+<div class="exam-meta">
+  <div class="meta-item">Total Questions: <span>150</span></div>
+  <div class="meta-item">MCQ: <span>120</span></div>
+  <div class="meta-item">True / False: <span>30</span></div>
+  <div class="meta-item">Chapters: <span>5, 6, 9, 12, 13</span></div>
+</div>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 150 answered</div>
+</div>
+<div class="container" id="examContainer"></div>
+<div class="score-panel" id="scorePanel">
+  <h2>Exam Complete</h2>
+  <div class="score-big" id="scoreBig"></div>
+  <div class="score-sub" id="scoreSub"></div>
+  <div class="score-breakdown" id="scoreBreakdown"></div>
+  <div class="grade-badge" id="gradeBadge"></div>
+</div>
+<script>
+const questions = [
+// ══════════════════════════════════════════
+// CHAPTER 5 — MCQ (24 questions)
+// ══════════════════════════════════════════
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Electronic commerce is best defined as:',
+ opts:['Using computers for internal payroll only','Conducting business activities electronically over computer networks','Storing customer data in databases','Printing paper-based business documents'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which type of e-commerce involves transactions exclusively between organizations?',
+ opts:['B2C','C2C','B2B','G2C'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Disintermediation in B2C e-commerce means:',
+ opts:['Adding more intermediaries to the supply chain','Customers dealing directly with organizations and avoiding intermediaries','Increasing the number of distributors','Using government portals for commerce'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which of the following is a popular C2C e-commerce platform?',
+ opts:['Amazon AWS','SAP ERP','eBay','Oracle Database'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'E-government in the form G2B stands for:',
+ opts:['Government to Business','Government to Broadcast','General to Business','Global to Bilateral'],ans:0},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'The Internet Corporation for Assigned Names and Numbers (ICANN) created which domain to attract mobile users?',
+ opts:['.mobile','.mobi','.mcom','.mweb'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which is NOT listed as an advantage of electronic and mobile commerce?',
+ opts:['Reach new customers','Reduce cost of doing business','Eliminate all privacy concerns','Speed the flow of goods and information'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A digital certificate is used to:',
+ opts:['Encrypt hard drives','Verify the identity of a sender or website','Back up databases','Issue refunds automatically'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A Certificate Authority (CA) is:',
+ opts:['A government regulatory body for e-commerce','A trusted third-party that issues digital certificates','A firewall manufacturer','An online payment processor'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'The Address Verification System (AVS) is used to:',
+ opts:['Locate shipping addresses','Compare the cardholder address on file with the address provided','Verify email addresses','Check product availability'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A charge card differs from a credit card in that:',
+ opts:['It has a preset spending limit','The entire amount is due at the end of the billing period','It deducts money immediately from the bank account','It has an embedded microchip'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'In a batch processing system, what is the essential characteristic?',
+ opts:['Immediate real-time processing','A delay between an event and the processing of the related transaction','Automatic error correction','Cloud-based data storage'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Online Transaction Processing (OLTP) ensures that:',
+ opts:['Data is processed in large batches once a day','Each transaction is processed immediately and data reflects current status','Transactions are queued for weekly processing','Only managers can access transaction data'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'The transaction processing cycle begins with which step?',
+ opts:['Document production','Data storage','Data collection','Data manipulation'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Source data automation involves:',
+ opts:['Manual entry of transaction data','Capturing data at its source automatically with minimal manual effort','Printing reports for manual review','Batch uploading data at end of day'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Enterprise Resource Planning (ERP) is best described as:',
+ opts:['A single accounting software package','A set of integrated programs managing a company\'s vital business operations for the entire organization','A customer-only portal','A hardware procurement system'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'ERP systems evolved from which earlier systems developed in the 1970s?',
+ opts:['Decision support systems (DSS)','Knowledge management systems (KMS)','Materials requirement planning (MRP)','Geographic information systems (GIS)'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which is an advantage of implementing an ERP system?',
+ opts:['Increased number of legacy systems','Improved access to quality data for operational decision making','Higher hardware maintenance costs','More manual business processes'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A Customer Relationship Management (CRM) system primarily helps a company:',
+ opts:['Manage hardware inventory','Manage all aspects of customer encounters including marketing, sales, and service','Control manufacturing processes','Handle employee payroll'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Data editing in transaction processing involves:',
+ opts:['Storing data in the database','Checking data for validity and completeness to detect problems','Generating printed reports','Backing up transaction logs'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'In B2B e-commerce, the typical value of a sale is:',
+ opts:['Tens of dollars','Hundreds of dollars','Thousands or millions of dollars','Always less than B2C'],ans:2},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which of the following is a major challenge of e-commerce?',
+ opts:['Too many payment options','Dealing with consumer privacy concerns','Excessive website speed','Too much customer trust'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A debit card operates like:',
+ opts:['A credit line extended by the bank','Cash or a personal check — money is immediately deducted','A charge card with monthly billing','A smart card with encrypted microchip'],ans:1},
+{type:'mcq',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Which system provides valuable input to management information systems, decision support systems, and knowledge management systems?',
+ opts:['ERP','CRM','TPS (Transaction Processing System)','Dashboard'],ans:2},
+
+// ══════════════════════════════════════════
+// CHAPTER 6 — MCQ (24 questions)
+// ══════════════════════════════════════════
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Business analytics is defined as:',
+ opts:['The process of entering sales data into spreadsheets','Extensive use of data and quantitative analysis to support fact-based decision making','Storing data in a central server','Automating routine transaction processing'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Business Intelligence (BI) includes all of the following EXCEPT:',
+ opts:['Data extraction','Data visualization','Data manipulation of physical inventory','Data presentation'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A data warehouse is:',
+ opts:['A physical room storing paper files','A large collection of data built from multiple sources used for BI','A real-time transaction system','An employee HR portal'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Which of the following is a benefit achieved from BI and analytics?',
+ opts:['Detect fraud','Increase employee headcount','Add more paper-based processes','Reduce customer choices'],ans:0},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A data scientist combines strong business acumen, deep analytics understanding, and:',
+ opts:['Expertise in legal compliance only','A healthy appreciation of the limitations of data, tools, and techniques','A background exclusively in marketing','Physical engineering skills'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Data governance defines:',
+ opts:['The physical location of data centers','Roles, responsibilities, and processes ensuring data can be trusted and used by the whole organization','The speed of data transfer across networks','The number of users allowed to access data'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Data mining is a BI analytics tool used to:',
+ opts:['Store large amounts of data securely','Explore large amounts of data for hidden patterns to predict future trends','Generate invoices automatically','Back up organizational databases'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Association analysis in data mining:',
+ opts:['Uses historical cases to recognize patterns','Examines historical data to make predictions','Sorts through data and forms statistical rules about relationships among items','Identifies fraudulent transactions only'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Neural computing in data mining:',
+ opts:['Forms statistical rules about item relationships','Examines historical data for patterns and uses them to make predictions','Generates billing reports','Creates customer profiles for marketing'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Case-based reasoning in data mining uses:',
+ opts:['Random data sampling','Statistical regression models','Historical if-then-else cases to recognize patterns','Real-time sensor data'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Key Performance Indicators (KPIs) consist of a direction, measure, target, and:',
+ opts:['Budget allocation','Time frame','Team name','Geographic region'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A dashboard in BI:',
+ opts:['Is used only by top executives','Presents a set of KPIs about the state of a process at a specific point in time','Replaces the organization\'s database','Only displays financial data'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Operational dashboards can draw data in:',
+ opts:['Weekly batch reports only','Real time from various sources','Monthly summaries only','Annual reports'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Which company is listed as a widely used BI software vendor?',
+ opts:['Facebook','Twitter','IBM','Tesla'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'The job outlook for data scientists is described as:',
+ opts:['Declining','Stable but slow','Extremely bright','Uncertain'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Business analytics can be used to forecast:',
+ opts:['Only past business results','Future business results','Employee satisfaction only','Physical inventory locations'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Data used in BI may come from:',
+ opts:['Only internal organizational sources','Only external market sources','Both internal and external sources','Only government databases'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'To become a data scientist, which skills are required?',
+ opts:['Only communication skills','Mastery of statistics, math, and computer programming','Only business management skills','Only graphic design skills'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Which of the following is an example of data mining in use?',
+ opts:['Printing daily sales reports','Monitoring credit card transactions to identify likely fraudulent requests','Updating employee contact information','Scheduling staff meetings'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Business analytics helps organizations by:',
+ opts:['Eliminating the need for human decision makers','Revealing new business patterns and relationships','Replacing all IT infrastructure','Automating all customer interactions'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A management team must have what commitment for effective BI?',
+ opts:['Commitment to hiring more data entry staff','Strong commitment to data-driven decision making','Commitment to reducing analytics budgets','Commitment to paper-based reporting'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Data lakes differ from data warehouses in that they:',
+ opts:['Only store structured data','Store data in a more raw, unprocessed form','Are only used for small businesses','Do not support BI tools'],ans:1},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Which of the following is NOT a use of data mining?',
+ opts:['Adjusting hotel room rates to maximize revenue','Analyzing demographic data of potential customers','Printing payroll checks','Recognizing DNA sequence changes related to disease risk'],ans:2},
+{type:'mcq',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A well-defined KPI example for a university would be to:',
+ opts:['Purchase new computers every year','Increase the five-year graduation rate to at least 80% starting with a specific class','Hire 10 new professors','Build a new campus building'],ans:1},
+
+// ══════════════════════════════════════════
+// CHAPTER 9 — MCQ (24 questions)
+// ══════════════════════════════════════════
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Soft skills are best described as:',
+ opts:['Technical programming abilities','Personal attributes and qualities that enable individuals to interact effectively with others','Hardware troubleshooting skills','Financial modeling capabilities'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Communication skills include all of the following EXCEPT:',
+ opts:['Active listening','Clear and concise messaging','Debugging software code','Non-verbal communication'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Active listening involves:',
+ opts:['Preparing your response while the other person speaks','Fully concentrating on and understanding what others are saying','Speaking loudly and clearly','Avoiding eye contact'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'A benefit of strong communication skills is:',
+ opts:['Increased conflict and misunderstanding','Reduced collaboration','Improved collaboration and stronger professional relationships','Slower productivity'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Teamwork and collaboration involve:',
+ opts:['Working independently on all tasks','Working effectively with others to achieve common goals using diverse perspectives','Competing with colleagues for promotions','Avoiding group decision-making'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'A benefit of effective teamwork is:',
+ opts:['Reduced creativity','Decreased team morale','Increased creativity and improved problem-solving','Lower productivity'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Problem-solving refers to the ability to:',
+ opts:['Avoid challenges whenever possible','Analyze challenges, generate solutions, and make informed decisions','Follow instructions without questioning','Delegate all difficult tasks'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'To improve problem-solving skills, one should:',
+ opts:['Avoid diverse perspectives','Practice critical thinking and evaluate situations from different perspectives','Stick to familiar approaches only','Rely solely on past decisions'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Adaptability and flexibility enable individuals to:',
+ opts:['Resist all organizational changes','Stay relevant and thrive in a dynamic work environment','Avoid learning new technologies','Work only in stable environments'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'To improve adaptability, one effective strategy is:',
+ opts:['Stay within your comfort zone','Avoid new technologies','Seek new experiences that challenge your comfort zone','Refuse changing priorities'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Time management and organization contribute to:',
+ opts:['Increased stress and missed deadlines','Productivity, efficiency, and work-life balance','Reduced output quality','More disorganized workspaces'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Which of the following is an example of good time management?',
+ opts:['Avoiding to-do lists','Working without goals','Setting clear goals and creating schedules to allocate time for tasks','Multitasking without prioritizing'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Leadership is defined as the ability to:',
+ opts:['Control employees through strict rules','Inspire, guide, and influence others toward achieving common goals','Avoid team collaboration','Focus only on individual performance'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'An example of effective leadership is:',
+ opts:['Micromanaging every detail','Keeping all decisions secret from the team','Empowering team members by delegating responsibilities','Discouraging team input'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Emotional intelligence involves:',
+ opts:['Ignoring the emotions of others','Recognizing, understanding, and managing one\'s own emotions and those of others','Suppressing all emotions at work','Focusing only on technical skills'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Empathy, as part of emotional intelligence, refers to:',
+ opts:['Imposing your feelings on others','The ability to understand and share the feelings of others','Avoiding emotional situations','Criticizing others\' emotional responses'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Professionalism and work ethic encompass:',
+ opts:['Inconsistency and frequent lateness','Reliability, integrity, and a commitment to excellence','Minimal effort to complete tasks','Avoiding feedback from supervisors'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Meeting deadlines consistently is an example of:',
+ opts:['Poor time management','Demonstrating adaptability','Demonstrating reliability and professionalism','Emotional intelligence'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'A benefit of high emotional intelligence is:',
+ opts:['Increased workplace conflict','Improved communication and better workplace relationships','Reduced personal growth','Lower career opportunities'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Why are soft skills important in today\'s job market?',
+ opts:['Because technical skills are no longer needed','Because employers value a combination of technical and soft skills','Because soft skills replace all technical knowledge','Because they eliminate the need for teamwork'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'To improve leadership, one should:',
+ opts:['Avoid seeking feedback','Seek feedback from colleagues and learn from successful leaders','Focus only on technical expertise','Limit communication to emails'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Brainstorming and idea sharing in a team is an example of:',
+ opts:['Leadership only','Individual problem-solving','Fostering collaboration and open communication','Emotional intelligence'],ans:2},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Which benefit is associated with strong adaptability skills?',
+ opts:['Decreased resilience','Enhanced resilience and increased growth opportunities','More rigid thinking','Reduced innovation'],ans:1},
+{type:'mcq',ch:9,chTitle:'Soft Skills',
+ q:'Going above and beyond expectations to deliver high-quality work is an example of:',
+ opts:['Poor work-life balance','Strong time management','Strong professionalism and work ethic','Lack of adaptability'],ans:2},
+
+// ══════════════════════════════════════════
+// CHAPTER 12 — MCQ (24 questions)
+// ══════════════════════════════════════════
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The systems development process is used by corporations to:',
+ opts:['Only hire new IT staff','Build information systems to achieve organizational goals','Replace all existing hardware','Reduce the number of employees'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A project manager is the person assigned to:',
+ opts:['Only write code for the system','Do the work of the project and achieve the project objectives','Manage hardware procurement exclusively','Train end users after implementation'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Stakeholders in systems development are:',
+ opts:['Only the IT department staff','People who will regularly interact with the system daily','People ultimately affected (for better or worse) by the systems development project','The project manager and sponsor only'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A systems analyst specializes in:',
+ opts:['Hardware installation only','Network administration','Analyzing and designing business systems','Writing marketing content'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A programmer in systems development is responsible for:',
+ opts:['Conducting feasibility studies','Modifying or developing programs to satisfy user requirements','Managing the project budget','Leading the steering team'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The steering team in a systems development project:',
+ opts:['Is composed entirely of programmers','Is a small group of senior managers providing guidance and support','Handles only testing activities','Is responsible only for user training'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A project sponsor plays a critical role because:',
+ opts:['They write all the software code','Lack of this person raises the distinct probability of project failure','They manage all hardware installations','They conduct all user acceptance tests'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Critical Success Factors (CSFs) are:',
+ opts:['Budget estimates for IT projects','Hardware specifications','Factors essential to the success of a functional area of an organization','Security protocols for data access'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Systems development initiatives can arise from:',
+ opts:['Only top management levels','Only unplanned emergencies','All levels of an organization and can be planned or unplanned','Only from the IT department'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The traditional SDLC is:',
+ opts:['An iterative sprint-based process','A sequential multistage process where each stage must be approved before the next','A rapid prototyping approach','An end-user development model'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Which is an advantage of the traditional SDLC?',
+ opts:['Users always get exactly what they needed','Formal review at the end of each phase allows maximum management control','It requires no documentation','It is fast and flexible'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A disadvantage of the traditional SDLC is that:',
+ opts:['It has too few intermediate products','Documentation is expensive and time-consuming to create and keep current','Management has too little control','It is too flexible and unstructured'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The first step of the systems investigation phase is to:',
+ opts:['Develop a budget','Perform feasibility analysis','Review the systems investigation request','Identify and recruit team members'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Joint Application Development (JAD) is:',
+ opts:['A software coding methodology','A structured meeting process that accelerates investigation, analysis, and design','A hardware procurement method','A user training program'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Feasibility analysis assesses which of the following dimensions?',
+ opts:['Only financial costs','Technical, economic, legal, operational, and schedule feasibility','Only technical feasibility','Only legal compliance'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The systems analysis phase is used to:',
+ opts:['Define exactly how the system will be built','Define what the information system must do to solve the problem','Test the completed system','Deploy the system to users'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The make-versus-buy decision refers to:',
+ opts:['Deciding whether to purchase or lease hardware','Deciding whether to obtain software from internal or external sources','Choosing between cloud and on-premise storage','Selecting between two vendor proposals'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The systems design phase is used to:',
+ opts:['Define what the system must do','Test individual programs','Define exactly how the information system will solve a problem','Train end users'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A disaster recovery plan is created during which phase?',
+ opts:['Systems investigation','Systems construction','Systems design','User acceptance testing'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Good user interface design principles focus on:',
+ opts:['Making the system as complex as possible','Interfaces that are accessible, easy to use, and efficient','Adding as many features as possible','Using the most advanced technology available'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A Request for Proposal (RFP) is used when:',
+ opts:['Testing a completed system','Hiring project team members','Soliciting software solutions from external vendors','Conducting user interviews'],ans:2},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Functional decomposition is a technique used to:',
+ opts:['Break down hardware components','Define the business processes included within the scope of the system','Test software modules','Generate system reports'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'The systems analysis report concludes with a recommendation to:',
+ opts:['Immediately build the system','Stop, revise, or go forward with the development project','Begin user training','Acquire hardware'],ans:1},
+{type:'mcq',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'An entity-relationship (ER) diagram is used to:',
+ opts:['Map employee organizational hierarchy','Model data and relationships between data entities in a database','Create the user interface layout','Document project budgets'],ans:1},
+
+// ══════════════════════════════════════════
+// CHAPTER 13 — MCQ (24 questions)
+// ══════════════════════════════════════════
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The goal of systems construction is to:',
+ opts:['Define what the system must do','Convert the system design into an operational system','Conduct feasibility analysis','Train end users'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The steps of the system construction phase include all EXCEPT:',
+ opts:['Acquire and install hardware','Perform unit testing','Create and load data','Present findings to the steering team'],ans:3},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Software as a Service (SaaS) means:',
+ opts:['Software installed on local servers','Subscribing to web-delivered application software','Purchasing a software license for one computer','Developing software internally'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'CASE tools are used to:',
+ opts:['Test networks','Generate program source code','Design physical hardware layouts','Train new employees'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The "Create and Load Data" step involves:',
+ opts:['Only deleting old records','Making sure all files and databases are populated and ready for the new system','Designing the user interface','Writing system documentation'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Unit testing is designed to:',
+ opts:['Test all system components together under real-world conditions','Force an individual program to execute all its functions including abnormal input','Evaluate performance under high load','Verify user acceptance'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Integration testing involves:',
+ opts:['Testing individual modules in isolation','Linking all individual components together and testing them as a group','Evaluating performance under high volume','Getting user approval of the finished system'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'System testing validates that:',
+ opts:['Individual units perform as designed','The information system meets all specified requirements','Performance holds under heavy load','Users accept the system in real-world conditions'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Volume testing aims to:',
+ opts:['Verify unit-level code functions','Determine the workload at which system performance begins to degrade','Check user interface usability','Confirm legal compliance'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'User Acceptance Testing (UAT) is performed by:',
+ opts:['Independent software testers','The project manager only','Trained system users to verify the system in a real-world operating environment','The steering team'],ans:2},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The steps of the implementation phase include all of the following EXCEPT:',
+ opts:['User preparation','Site preparation','Unit testing','Cutover'],ans:2},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'User preparation involves:',
+ opts:['Installing hardware on the site','Readying managers, employees, and stakeholders to accept and use the new system','Coding all software components','Backing up old databases'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Site preparation for a large system may require:',
+ opts:['Only rearranging office furniture','Special wiring, air conditioning, or construction','Only purchasing new desks','Simply updating user passwords'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Direct conversion (plunge) is considered:',
+ opts:['The safest cutover method','A phased approach used for gradual migration','A high-risk approach where all users switch at once','A pilot approach used for one group first'],ans:2},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The phase-in approach to cutover involves:',
+ opts:['All users switching at the same moment','Slowly phasing in new system components as old ones are phased out','Running both systems in parallel indefinitely','Deploying to one user group only first'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Pilot start-up means:',
+ opts:['Testing software with synthetic data','Running the complete new system for only one group of users first','Switching all users at once','Shutting down the old system immediately'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'System operation involves:',
+ opts:['Only the initial deployment of the system','Using the new or modified system under all kinds of operating conditions','Only conducting feasibility studies','Writing design documentation'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Systems review is:',
+ opts:['The process of deploying a new system','The process of analyzing systems to make sure they are operating as intended','The testing phase before launch','The feasibility analysis phase'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Systems maintenance involves:',
+ opts:['Disposing of old hardware','Changing and enhancing the system to extend its useful life','Only fixing critical bugs at launch','Rewriting the system from scratch annually'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Agile development builds a system in increments called:',
+ opts:['Phases','Modules','Sprints','Batches'],ans:2},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'A prototype in systems development is:',
+ opts:['The final delivered system','A working model of a system','A design document','A feasibility report'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'End-user systems development refers to:',
+ opts:['IT professionals building mission-critical enterprise apps','Nonprofessional developers creating or modifying software','Third-party vendors delivering SaaS solutions','AI automatically generating system code'],ans:1},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Which of the following is a common cause of IS project failure?',
+ opts:['Excessive and involved executive leadership','Clear and well-defined project scope','Insufficient user involvement','Too many skilled programmers'],ans:2},
+{type:'mcq',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Poor planning as a cause of project failure can be countered by:',
+ opts:['Reducing user involvement','Using project management tools to document who needs to do what and when','Eliminating the steering team','Skipping the analysis phase'],ans:1},
+
+// ══════════════════════════════════════════
+// TRUE / FALSE — 6 per chapter (30 total)
+// ══════════════════════════════════════════
+// Ch5 T/F
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Business activities that are paper-based and time-consuming are strong candidates for conversion to e-commerce.',ans:true},
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'In C2C e-commerce, the typical value of each sale is usually thousands or millions of dollars.',ans:false},
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'Online Transaction Processing (OLTP) processes each transaction immediately, keeping data current at all times.',ans:true},
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'A smart card is less secure than a conventional credit card because its data is not encrypted.',ans:false},
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'ERP systems were originally evolved from materials requirement planning (MRP) systems developed in the 1970s.',ans:true},
+{type:'tf',ch:5,chTitle:'E-Commerce & Enterprise Systems',
+ q:'The goal of a CRM system is to understand and anticipate the needs of current and potential customers.',ans:true},
+// Ch6 T/F
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Business intelligence data is only collected from sources internal to the organization.',ans:false},
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A dashboard presents a set of KPIs about the state of a process at a specific point in time.',ans:true},
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Data mining is primarily a storage tool, not used to discover hidden patterns.',ans:false},
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'Case-based reasoning uses historical if-then-else cases to recognize patterns in data.',ans:true},
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'The job outlook for data scientists is described as extremely bright.',ans:true},
+{type:'tf',ch:6,chTitle:'Business Intelligence & Analytics',
+ q:'A KPI consists only of a direction and a target — no time frame is needed.',ans:false},
+// Ch9 T/F
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'Technical skills alone are sufficient for success in today\'s competitive job market.',ans:false},
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'Emotional intelligence facilitates effective communication, conflict resolution, and positive workplace relationships.',ans:true},
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'Adaptability means sticking rigidly to familiar methods and avoiding new technologies.',ans:false},
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'One benefit of strong problem-solving skills is a more proactive approach to challenges.',ans:true},
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'Professionalism includes exhibiting ethical behavior and adhering to professional standards.',ans:true},
+{type:'tf',ch:9,chTitle:'Soft Skills',
+ q:'Strong leadership discourages team members from sharing ideas or concerns.',ans:false},
+// Ch12 T/F
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Users are defined as people who will regularly interact with the information system.',ans:true},
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'In the traditional SDLC, work on the next stage can begin before the previous stage is reviewed.',ans:false},
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'JAD (Joint Application Development) is used only during the implementation phase.',ans:false},
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'A project sponsor\'s absence significantly raises the probability of project failure.',ans:true},
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Formal documentation in the traditional SDLC is inexpensive and easy to maintain.',ans:false},
+{type:'tf',ch:12,chTitle:'Systems Development: Investigation, Analysis & Design',
+ q:'Feasibility analysis evaluates technical, economic, legal, operational, and schedule dimensions.',ans:true},
+// Ch13 T/F
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Unit testing is conducted by trained end users in a real-world environment.',ans:false},
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Volume testing determines the workload at which system performance begins to degrade.',ans:true},
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'The pilot start-up approach deploys the new system to all users simultaneously.',ans:false},
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Systems maintenance involves changing and enhancing the system to extend its useful life.',ans:true},
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Poor planning is listed as one of the main reasons information systems projects fail.',ans:true},
+{type:'tf',ch:13,chTitle:'Systems Development: Construction to Disposal',
+ q:'Direct conversion (plunge) is considered the safest and lowest-risk cutover approach.',ans:false},
+];
+
+let answered = 0;
+const total = questions.length;
+const userAnswers = new Array(total).fill(null);
+
+function buildExam() {
+  const container = document.getElementById('examContainer');
+
+  // MCQ section
+  const mcqDiv = document.createElement('div');
+  const mcqHdr = document.createElement('div');
+  mcqHdr.className = 'section-header';
+  mcqHdr.innerHTML = `<div class="section-line"></div><div class="section-badge">Part I — Multiple Choice Questions (120)</div><div class="section-line"></div>`;
+  mcqDiv.appendChild(mcqHdr);
+
+  const mcqs = questions.map((q,i)=>({...q,idx:i})).filter(q=>q.type==='mcq');
+  let currentCh = null, dispNum = 0;
+  mcqs.forEach(q => {
+    dispNum++;
+    if (q.ch !== currentCh) {
+      currentCh = q.ch;
+      const chHdr = document.createElement('div');
+      chHdr.className = 'chapter-header';
+      chHdr.innerHTML = `<div class="chapter-num">${q.ch}</div><div class="chapter-info"><h3>${q.chTitle}</h3><p>Chapter ${q.ch}</p></div>`;
+      mcqDiv.appendChild(chHdr);
+    }
+    mcqDiv.appendChild(buildCard(q, dispNum));
+  });
+  container.appendChild(mcqDiv);
+
+  // T/F section
+  const tfDiv = document.createElement('div');
+  const tfHdr = document.createElement('div');
+  tfHdr.className = 'section-header';
+  tfHdr.innerHTML = `<div class="section-line"></div><div class="section-badge">Part II — True or False (30)</div><div class="section-line"></div>`;
+  tfDiv.appendChild(tfHdr);
+
+  const tfs = questions.map((q,i)=>({...q,idx:i})).filter(q=>q.type==='tf');
+  currentCh = null;
+  tfs.forEach(q => {
+    dispNum++;
+    if (q.ch !== currentCh) {
+      currentCh = q.ch;
+      const chHdr = document.createElement('div');
+      chHdr.className = 'chapter-header';
+      chHdr.innerHTML = `<div class="chapter-num">${q.ch}</div><div class="chapter-info"><h3>${q.chTitle}</h3><p>Chapter ${q.ch}</p></div>`;
+      tfDiv.appendChild(chHdr);
+    }
+    tfDiv.appendChild(buildCard(q, dispNum));
+  });
+  container.appendChild(tfDiv);
+
+  const btn = document.createElement('button');
+  btn.className = 'submit-btn';
+  btn.textContent = 'Submit Exam';
+  btn.onclick = showResults;
+  container.appendChild(btn);
+}
+
+function buildCard(q, displayNum) {
+  const card = document.createElement('div');
+  card.className = 'question-card';
+  card.id = `card-${q.idx}`;
+  card.innerHTML = `<div class="q-number">Question ${displayNum}</div><div class="q-text">${q.q}</div>`;
+
+  if (q.type === 'mcq') {
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    ['A','B','C','D'].forEach((lbl, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = `<span class="opt-label">${lbl}</span>${q.opts[oi]}`;
+      btn.onclick = () => selectMCQ(q.idx, oi, q.ans, card);
+      opts.appendChild(btn);
+    });
+    card.appendChild(opts);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'tf-buttons';
+    ['True','False'].forEach(val => {
+      const btn = document.createElement('button');
+      btn.className = 'tf-btn';
+      btn.textContent = val;
+      btn.onclick = () => selectTF(q.idx, val==='True', q.ans, card);
+      wrap.appendChild(btn);
+    });
+    card.appendChild(wrap);
+  }
+
+  const fb = document.createElement('div');
+  fb.className = 'feedback';
+  fb.id = `fb-${q.idx}`;
+  card.appendChild(fb);
+  return card;
+}
+
+function selectMCQ(qi, selected, correct, card) {
+  if (userAnswers[qi] !== null) return;
+  userAnswers[qi] = selected; answered++; updateProgress();
+  const btns = card.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  const ok = selected === correct;
+  btns[selected].classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) btns[correct].classList.add('reveal-correct');
+  card.classList.add(ok ? 'answered-correct' : 'answered-wrong');
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+  fb.textContent = ok ? '✓ Correct!' : '✗ Incorrect. The correct answer is highlighted above.';
+}
+
+function selectTF(qi, selected, correct, card) {
+  if (userAnswers[qi] !== null) return;
+  userAnswers[qi] = selected; answered++; updateProgress();
+  const btns = card.querySelectorAll('.tf-btn');
+  btns.forEach(b => b.disabled = true);
+  const ok = selected === correct;
+  const selBtn = selected ? btns[0] : btns[1];
+  const corBtn = correct ? btns[0] : btns[1];
+  selBtn.classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) corBtn.classList.add('correct');
+  card.classList.add(ok ? 'answered-correct' : 'answered-wrong');
+  const fb = document.getElementById(`fb-${qi}`);
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+  fb.textContent = ok ? '✓ Correct!' : `✗ Incorrect. The correct answer is ${correct ? 'True' : 'False'}.`;
+}
+
+function updateProgress() {
+  const pct = (answered/total)*100;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = `${answered} / ${total} answered`;
+}
+
+function showResults() {
+  const chScores = {};
+  questions.forEach((q,i) => {
+    if (!chScores[q.ch]) chScores[q.ch] = {correct:0,total:0,title:q.chTitle};
+    chScores[q.ch].total++;
+    if (userAnswers[i] === q.ans) chScores[q.ch].correct++;
+  });
+  let total_correct = 0;
+  Object.values(chScores).forEach(c => total_correct += c.correct);
+  const pct = Math.round((total_correct/total)*100);
+
+  let grade, color;
+  if (pct>=90){grade='A — Excellent';color='#16a34a';}
+  else if (pct>=80){grade='B — Good';color='#2563eb';}
+  else if (pct>=70){grade='C — Satisfactory';color='#d97706';}
+  else if (pct>=60){grade='D — Needs Improvement';color='#ea580c';}
+  else{grade='F — Unsatisfactory';color='#dc2626';}
+
+  const panel = document.getElementById('scorePanel');
+  panel.style.display = 'block';
+  document.getElementById('scoreBig').textContent = pct+'%';
+  document.getElementById('scoreSub').textContent = `You answered ${total_correct} out of ${total} questions correctly.`;
+
+  const bd = document.getElementById('scoreBreakdown');
+  Object.entries(chScores).forEach(([ch, s]) => {
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `<div class="val">${s.correct}/${s.total}</div><div class="lbl">Chapter ${ch}</div>`;
+    bd.appendChild(item);
+  });
+
+  const badge = document.getElementById('gradeBadge');
+  badge.textContent = grade; badge.style.background = color; badge.style.color='#fff';
+  panel.scrollIntoView({behavior:'smooth'});
+}
+
+buildExam();
+</script>
+</body>
+</html>
